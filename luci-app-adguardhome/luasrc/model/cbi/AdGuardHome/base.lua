@@ -37,7 +37,7 @@ else
 	local version=uci:get("AdGuardHome","AdGuardHome","version")
 	local testtime=fs.stat(binpath,"mtime")
 	if testtime~=tonumber(binmtime) or version==nil then
-		local tmp=luci.sys.exec(binpath.." --version 2>/dev/null | grep -m 1 -E '[0-9]+[.][0-9.]+' -o")
+		local tmp=luci.sys.exec(binpath.." --version 2>/dev/null | grep -m 1 -E '[0-9]+[.][Bbeta0-9\.\-]+' -o")
 		version=string.sub(tmp, 1, -2)
 		if version=="" then version="core error" end
 		uci:set("AdGuardHome","AdGuardHome","version",version)
@@ -84,6 +84,24 @@ if fs.stat(value,"type")=="dir" then
 end 
 return value
 end
+--- arch
+o = s:option(ListValue, "arch", translate("choose Arch for download"))
+o:value("",translate("Auto"))
+o:value("386",translate("i386"))
+o:value("amd64",translate("x86_64"))
+o:value("armv5",translate("armv5"))
+o:value("armv6",translate("armv6"))
+o:value("armv7",translate("armv7"))
+o:value("arm64",translate("aarch64"))
+o:value("mips_softfloat",translate("mips"))
+o:value("mips64_softfloat",translate("mips64"))
+o:value("mipsle_softfloat",translate("mipsel"))
+o:value("mips64le_softfloat",translate("mips64el"))
+o:value("ppc64le",translate("powerpc64"))
+o.description=translate("Need to save to config first before downloading.")
+o.default=""
+o.rmempty=true
+
 --- upx
 o = s:option(ListValue, "upxflag", translate("use upx to compress bin after download"))
 o:value("", translate("none"))
@@ -293,6 +311,14 @@ o:value("autogfwipset",translate("Auto update ipset list and restart adh"))
 o.widget = "checkbox"
 o.default = nil
 o.optional=true
+
+----downloadtarge
+o = s:option(ListValue, "tagname", translate("Choose Release Version for download"))
+o:value("release",translate("Release(Default)"))
+o:value("beta",translate("Beta"))
+o.description=translate("If this option is modified, please confirm the download links")
+o.default="release"
+o.rmempty=true
 
 ----downloadpath
 o = s:option(TextValue, "downloadlinks",translate("Download links for update"))
